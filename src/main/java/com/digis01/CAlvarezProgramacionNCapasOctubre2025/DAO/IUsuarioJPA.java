@@ -10,9 +10,9 @@ public interface IUsuarioJPA {
     Result GetAll();
 //    
     Result Add(UsuarioJPA usuario);
-//    
+    
 //    Result GetById(int IdUsuario);
-//    
-//    Result Update (UsuarioJPA usuario);
+   
+    Result Update (UsuarioJPA usuario);
     
 }

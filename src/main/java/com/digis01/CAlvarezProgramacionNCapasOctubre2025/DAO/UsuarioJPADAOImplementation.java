@@ -69,4 +69,33 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA{
     }
     
     
+    @Override
+    @Transactional
+    public Result Update (UsuarioJPA usuario){
+        Result result = new Result();
+        try{
+            if (usuario == null || usuario.IdUsuario <= 0) {
+                result.correct = false;
+                result.errorMessage = "Usuario no existente";
+                result.status = 400;
+                return result;  
+            }
+            
+            entityManager.merge(usuario);
+            entityManager.flush();
+            
+            result.correct = true;
+            result.status = 200;
+            result.object = usuario;
+            
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "Usuario no actualizado";
+            result.status = 404;
+            return result;
+        }
+        return result;
+    }
+    
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,5 +52,20 @@ public class UsuarioRestController {
 
         return ResponseEntity.status(result.status).body(result);
     }
-
+    
+    @PutMapping
+    public ResponseEntity Update(@RequestBody UsuarioJPA usuario) {
+        Result result = new Result();
+        try{
+            result = usuarioJPADAOImplementation.Update(usuario);
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "No se actualizo el usuario";
+            result.status = 500;
+        }
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
+ 
 }

@@ -39,4 +39,34 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA{
         }
         return result;
     }
+    
+    
+    @Override
+    @Transactional
+    public Result Add(UsuarioJPA usuario){
+        Result result = new Result();
+        try{
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "no puede ser nulo";
+                result.status = 400;
+                return result;
+            }
+            entityManager.persist(usuario);
+            entityManager.flush();
+            
+            result.correct = true;
+            result.status = 201;
+            result.object = usuario;
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        
+        return result;
+    }
+    
+    
 }

@@ -9,7 +9,7 @@ public interface IUsuarioJPA {
     
     Result GetAll();
 //    
-//    Result Add(UsuarioJPA usuario);
+    Result Add(UsuarioJPA usuario);
 //    
 //    Result GetById(int IdUsuario);
 //    

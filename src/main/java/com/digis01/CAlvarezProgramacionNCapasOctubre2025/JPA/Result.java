@@ -10,6 +10,8 @@ public class Result {
     public Object object;
     public List<Object> objects;
     public Object data;
+    
+    @JsonIgnore
     public Exception ex;
     @JsonIgnore
     public int status;

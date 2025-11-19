@@ -1,5 +1,6 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,27 +14,29 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "DIRECCION")
 public class DireccionJPA {
-    
+
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "iddireccion")
     private int IdDireccion;
-    
+
     @Column(name = "calle")
     private String Calle;
-    
-    @Column (name = "numerointerior")
+
+    @Column(name = "numerointerior")
     private String NumeroInterior;
-    
+
     @Column(name = "numeroexterior")
     private String NumeroExterior;
-    
+
     @ManyToOne
     @JoinColumn(name = "idcolonia")
+    @JsonIgnore
     public ColoniaJPA ColoniaJPA;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idusuario")
+    @JsonIgnore
     public UsuarioJPA UsuarioJPA;
 
     public int getIdDireccion() {
@@ -84,7 +87,4 @@ public class DireccionJPA {
         this.UsuarioJPA = UsuarioJPA;
     }
 
-    
-    
-    
 }

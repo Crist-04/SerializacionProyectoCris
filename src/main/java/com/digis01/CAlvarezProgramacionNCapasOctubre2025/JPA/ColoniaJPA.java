@@ -1,6 +1,7 @@
 
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class ColoniaJPA {
     
     @ManyToOne
     @JoinColumn (name = "idmunicipio")
+    @JsonIgnore
     public MunicipioJPA MunicipioJPA;
 
     public int getIdColonia() {

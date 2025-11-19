@@ -1,5 +1,6 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,6 +65,7 @@ public class UsuarioJPA {
     private RolJPA rol;
 
     @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<DireccionJPA> DireccionesJPA = new ArrayList<>();
     
     
@@ -71,121 +73,121 @@ public class UsuarioJPA {
     return rol;
 }
 
-public void setRol(RolJPA rol) {
-    this.rol = rol;
-}
-
-public List<DireccionJPA> getDireccionesJPA() {
-    return DireccionesJPA;
-}
-
-public void setDireccionesJPA(List<DireccionJPA> direccionesJPA) {
-    this.DireccionesJPA = direccionesJPA;
-}
-
-    public int getIdUsuario() {
-        return IdUsuario;
-    }
-
-    public void setIdUsuario(int IdUsuario) {
-        this.IdUsuario = IdUsuario;
-    }
-
-    public String getNombre() {
-        return Nombre;
-    }
-
-    public void setNombre(String Nombre) {
-        this.Nombre = Nombre;
-    }
-
-    public String getUsername() {
-        return Username;
-    }
-
-    public void setUsername(String Username) {
-        this.Username = Username;
-    }
-
-    public String getApellidoPaterno() {
-        return ApellidoPaterno;
-    }
-
-    public void setApellidoPaterno(String ApellidoPaterno) {
-        this.ApellidoPaterno = ApellidoPaterno;
-    }
-
-    public String getApellidoMaterno() {
-        return ApellidoMaterno;
-    }
-
-    public void setApellidoMaterno(String ApellidoMaterno) {
-        this.ApellidoMaterno = ApellidoMaterno;
-    }
-
-    public String getEmail() {
-        return Email;
-    }
-
-    public void setEmail(String Email) {
-        this.Email = Email;
-    }
-
-    public String getPassword() {
-        return Password;
-    }
-
-    public void setPassword(String Password) {
-        this.Password = Password;
-    }
-
-    public Date getFechaNacimiento() {
-        return FechaNacimiento;
-    }
-
-    public void setFechaNacimiento(Date FechaNacimiento) {
-        this.FechaNacimiento = FechaNacimiento;
-    }
-
-    public String getSexo() {
-        return Sexo;
-    }
-
-    public void setSexo(String Sexo) {
-        this.Sexo = Sexo;
-    }
-
-    public String getTelefono() {
-        return Telefono;
-    }
-
-    public void setTelefono(String Telefono) {
-        this.Telefono = Telefono;
-    }
-
-    public String getCelular() {
-        return Celular;
-    }
-
-    public void setCelular(String Celular) {
-        this.Celular = Celular;
-    }
-
-    public String getCURP() {
-        return CURP;
-    }
-
-    public void setCURP(String CURP) {
-        this.CURP = CURP;
-    }
-
-    public String getImagen() {
-        return Imagen;
-    }
-
-    public void setImagen(String Imagen) {
-        this.Imagen = Imagen;
-    }
+//public void setRol(RolJPA rol) {
+//    this.rol = rol;
+//}
+//
+//public List<DireccionJPA> getDireccionesJPA() {
+//    return DireccionesJPA;
+//}
+//
+//public void setDireccionesJPA(List<DireccionJPA> direccionesJPA) {
+//    this.DireccionesJPA = direccionesJPA;
+//}
+//
+//    public int getIdUsuario() {
+//        return IdUsuario;
+//    }
+//
+//    public void setIdUsuario(int IdUsuario) {
+//        this.IdUsuario = IdUsuario;
+//    }
+//
+//    public String getNombre() {
+//        return Nombre;
+//    }
+//
+//    public void setNombre(String Nombre) {
+//        this.Nombre = Nombre;
+//    }
+//
+//    public String getUsername() {
+//        return Username;
+//    }
+//
+//    public void setUsername(String Username) {
+//        this.Username = Username;
+//    }
+//
+//    public String getApellidoPaterno() {
+//        return ApellidoPaterno;
+//    }
+//
+//    public void setApellidoPaterno(String ApellidoPaterno) {
+//        this.ApellidoPaterno = ApellidoPaterno;
+//    }
+//
+//    public String getApellidoMaterno() {
+//        return ApellidoMaterno;
+//    }
+//
+//    public void setApellidoMaterno(String ApellidoMaterno) {
+//        this.ApellidoMaterno = ApellidoMaterno;
+//    }
+//
+//    public String getEmail() {
+//        return Email;
+//    }
+//
+//    public void setEmail(String Email) {
+//        this.Email = Email;
+//    }
+//
+//    public String getPassword() {
+//        return Password;
+//    }
+//
+//    public void setPassword(String Password) {
+//        this.Password = Password;
+//    }
+//
+//    public Date getFechaNacimiento() {
+//        return FechaNacimiento;
+//    }
+//
+//    public void setFechaNacimiento(Date FechaNacimiento) {
+//        this.FechaNacimiento = FechaNacimiento;
+//    }
+//
+//    public String getSexo() {
+//        return Sexo;
+//    }
+//
+//    public void setSexo(String Sexo) {
+//        this.Sexo = Sexo;
+//    }
+//
+//    public String getTelefono() {
+//        return Telefono;
+//    }
+//
+//    public void setTelefono(String Telefono) {
+//        this.Telefono = Telefono;
+//    }
+//
+//    public String getCelular() {
+//        return Celular;
+//    }
+//
+//    public void setCelular(String Celular) {
+//        this.Celular = Celular;
+//    }
+//
+//    public String getCURP() {
+//        return CURP;
+//    }
+//
+//    public void setCURP(String CURP) {
+//        this.CURP = CURP;
+//    }
+//
+//    public String getImagen() {
+//        return Imagen;
+//    }
+//
+//    public void setImagen(String Imagen) {
+//        this.Imagen = Imagen;
+//    }
 
 
 

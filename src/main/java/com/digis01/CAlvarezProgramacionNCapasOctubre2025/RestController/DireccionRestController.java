@@ -5,6 +5,7 @@ import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.DireccionJPA;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,5 +36,14 @@ public class DireccionRestController {
         return ResponseEntity.status(result.status).body(result);
     }
     
+    
+    @DeleteMapping("/{idDireccion}")
+    public ResponseEntity DeleteDireccion(@PathVariable int idDireccion){
+        Result result = new Result();
+        
+        result = direccionJPADAOImplementation.DeleteDireccion(idDireccion);
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
 
 }

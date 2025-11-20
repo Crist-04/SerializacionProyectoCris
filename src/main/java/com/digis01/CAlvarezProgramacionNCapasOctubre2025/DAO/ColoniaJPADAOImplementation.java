@@ -17,53 +17,29 @@ public class ColoniaJPADAOImplementation {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
-    
 
     public Result GetByIdMunicipio(int idMunicipio) {
         Result result = new Result();
-        
+
         try {
-            String jpql = "SELECT c FROM ColoniaJPA c WHERE c.municipioJPA.idMunicipio = :idMunicipio";
-            TypedQuery<ColoniaJPA> query = entityManager.createQuery(jpql, ColoniaJPA.class);
-            query.setParameter("idMunicipio", idMunicipio);
-            
-            List<ColoniaJPA> coloniasJPA = query.getResultList();
-            
-            
+            List<ColoniaJPA> colonias = entityManager
+                    .createQuery("SELECT c FROM ColoniaJPA c WHERE  c.MunicipioJPA.IdMunicipio = :idMunicipio", ColoniaJPA.class)
+                    .setParameter("idMunicipio", idMunicipio)
+                    .getResultList();
             
             result.correct = true;
-            
+            result.status = 200;
+            result.object = colonias;
+
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getMessage();
             result.ex = ex;
-            result.objects = null;
+            result.status = 500;
+            
         }
-        
+
         return result;
     }
-    
-    public Result GetByIdColonia(int idColonia) {
-        Result result = new Result();
-        
-        try {
-            ColoniaJPA coloniaJPA = entityManager.find(ColoniaJPA.class, idColonia);
-            
-            if (coloniaJPA != null) {
-                
-            } else {
-                result.correct = false;
-                result.errorMessage = "Colonia no encontrada";
-            }
-            
-        } catch (Exception ex) {
-            result.correct = false;
-            result.errorMessage = ex.getMessage();
-            result.ex = ex;
-            result.object = null;
-        }
-        
-        return result;
-    }
+
 }

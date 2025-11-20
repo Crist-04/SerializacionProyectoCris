@@ -17,6 +17,7 @@ public class MunicipioDAOJPAImplementation implements IMunicipioJPA {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Override
     public Result GetByIdEstado(int idEstado) {
         Result result = new Result();
         try {

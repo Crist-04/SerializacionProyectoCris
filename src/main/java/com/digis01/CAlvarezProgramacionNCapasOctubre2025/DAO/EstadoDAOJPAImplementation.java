@@ -13,17 +13,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class EstadoDAOJPAImplementation {
+public class EstadoDAOJPAImplementation implements IEstadoJPA {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
-  
 
+    @Override
     public Result GetByIdPais(int idPais) {
         Result result = new Result();
-        
-        
+        try {
+            List<EstadoJPA> estados = entityManager.createQuery("SELECT c FROM EstadoJPA c WHERE c.PaisJPA.IdPais = :idPais", EstadoJPA.class)
+                    .setParameter("idPais", idPais)
+                    .getResultList();
+
+            result.correct = true;
+            result.object = estados;
+            result.status = 200;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Estado no Encontrado";
+            result.status = 500;
+        }
+
         return result;
     }
 }

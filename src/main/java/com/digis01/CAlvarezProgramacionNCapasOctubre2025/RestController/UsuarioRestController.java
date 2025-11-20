@@ -84,5 +84,21 @@ public class UsuarioRestController {
         
         return ResponseEntity.status(result.status).body(result);
     }
+    
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity GetById(@PathVariable int idUsuario){
+        Result result = new Result();
+        try{
+            result = usuarioJPADAOImplementation.GetById(idUsuario);
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "Error, el usuario no se encontro";
+            result.status = 500;
+        }
+        
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
  
 }

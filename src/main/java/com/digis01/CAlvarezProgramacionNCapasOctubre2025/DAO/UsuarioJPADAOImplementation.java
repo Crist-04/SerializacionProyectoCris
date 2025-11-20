@@ -122,5 +122,26 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         }
         return result;
     }
+    
+    @Override
+    public Result GetById(int idUsuario){
+        Result result = new Result();
+        try{
+            
+            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+            
+            result.correct = true;
+            result.status = 200;
+            result.object = usuario;
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "El Usuario no se encontro";
+            result.status = 500;
+        }
+        
+        
+        return result;
+    }
 
 }

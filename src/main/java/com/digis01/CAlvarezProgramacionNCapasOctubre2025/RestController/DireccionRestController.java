@@ -26,5 +26,14 @@ public class DireccionRestController {
         
         return ResponseEntity.status(result.status).body(result);
     }
+    
+    @PutMapping("/{idUsuario}")
+    public ResponseEntity UpdateDireccion(@RequestBody DireccionJPA direccion, @PathVariable int idUsuario){
+        Result result = new Result();
+        result = direccionJPADAOImplementation.UpdateDireccion(direccion, idUsuario);
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
+    
 
 }

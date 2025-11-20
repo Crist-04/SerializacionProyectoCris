@@ -12,17 +12,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class MunicipioDAOJPAImplementation {
+public class MunicipioDAOJPAImplementation implements IMunicipioJPA {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
-    
 
     public Result GetByIdEstado(int idEstado) {
         Result result = new Result();
-        
-        
+        try {
+            List<MunicipioJPA> municipios = entityManager
+                    .createQuery("SELECT c FROM MunicipioJPA c WHERE c.EstadoJPA.IdEstado = :idEstado", MunicipioJPA.class)
+                    .setParameter("idEstado", idEstado)
+                    .getResultList();
+            
+            result.correct = true;
+            result.object = municipios;
+            result.status = 200;
+            
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "No se encontro el municipio";
+            result.status = 500;
+        }
+
         return result;
     }
 }

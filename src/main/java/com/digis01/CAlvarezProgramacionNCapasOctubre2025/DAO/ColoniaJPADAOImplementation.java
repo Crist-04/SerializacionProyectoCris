@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class ColoniaJPADAOImplementation {
+public class ColoniaJPADAOImplementation  implements IColoniaJPA{
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -39,6 +39,28 @@ public class ColoniaJPADAOImplementation {
             
         }
 
+        return result;
+    }
+    
+    public Result GetByCodigoPostal(String codigoPostal){
+        Result result = new Result();
+        try{
+            List<ColoniaJPA> colonias = entityManager
+                    .createQuery("SELECT c FROM ColoniaJPA c WHERE c.CodigoPostal = :codigoPostal", ColoniaJPA.class)
+                    .setParameter("codigoPostal", codigoPostal)
+                    .getResultList();
+            
+            result.correct = true;
+            result.object = colonias;
+            result.status = 200;
+            
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "Codigo Postal no Encontrado";
+            result.status = 500;
+        }
+        
         return result;
     }
 

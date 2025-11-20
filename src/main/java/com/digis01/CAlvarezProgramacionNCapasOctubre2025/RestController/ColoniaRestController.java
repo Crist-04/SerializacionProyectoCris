@@ -26,4 +26,12 @@ public class ColoniaRestController {
         return ResponseEntity.status(result.status).body(result);
     }
     
+    @GetMapping("/codigoPostal/{codigoPostal}")
+    public ResponseEntity GetByCodigoPostal(@PathVariable String codigoPostal){
+        Result result = new Result();
+        result = coloniaJPADAOImplementation.GetByCodigoPostal(codigoPostal);
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
+    
 }

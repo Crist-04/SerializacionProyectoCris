@@ -5,7 +5,9 @@ import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.Result;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,6 +64,21 @@ public class UsuarioRestController {
         }catch(Exception ex){
             result.correct = false;
             result.errorMessage = "No se actualizo el usuario";
+            result.status = 500;
+        }
+        
+        return ResponseEntity.status(result.status).body(result);
+    }
+    
+    @DeleteMapping("/{idUsuario}")
+    public ResponseEntity Delete(@PathVariable int idUsuario){
+        Result result = new Result();
+        try{
+            result = usuarioJPADAOImplementation.Delete(idUsuario);
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "Eror No se Elimino el usuario";
             result.status = 500;
         }
         

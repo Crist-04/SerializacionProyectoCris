@@ -1,5 +1,6 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,10 +35,12 @@ public class DireccionJPA {
     @JsonIgnore
     public ColoniaJPA ColoniaJPA;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idusuario")
-    @JsonIgnore
-    public UsuarioJPA UsuarioJPA;
+@ManyToOne
+@JoinColumn(name = "idusuario")
+@JsonBackReference
+private UsuarioJPA UsuarioJPA;
+
+
 
     public int getIdDireccion() {
         return IdDireccion;
@@ -79,6 +82,7 @@ public class DireccionJPA {
         this.ColoniaJPA = ColoniaJPA;
     }
 
+    @JsonIgnore
     public UsuarioJPA getUsuarioJPA() {
         return UsuarioJPA;
     }

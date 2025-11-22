@@ -1,6 +1,7 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,9 +65,11 @@ public class UsuarioJPA {
     @JoinColumn(name = "idrol")
     private RolJPA rol;
 
-    @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<DireccionJPA> DireccionesJPA = new ArrayList<>();
+@OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
+@JsonManagedReference
+private List<DireccionJPA> direccionesJPA = new ArrayList<>();
+
+
     
     
     public RolJPA getRol() {

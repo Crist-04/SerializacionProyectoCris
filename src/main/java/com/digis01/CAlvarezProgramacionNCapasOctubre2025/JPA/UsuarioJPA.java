@@ -57,7 +57,7 @@ public class UsuarioJPA {
 
     @Column(name = "curp")
     public String CURP;
-    
+
     @Column(name = "imagen")
     public String Imagen;
 
@@ -65,16 +65,13 @@ public class UsuarioJPA {
     @JoinColumn(name = "idrol")
     private RolJPA rol;
 
-@OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
-@JsonManagedReference
-private List<DireccionJPA> direccionesJPA = new ArrayList<>();
+    @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.PERSIST)
+    @JsonManagedReference
+    public List<DireccionJPA> direccionesJPA = new ArrayList<>();
 
-
-    
-    
     public RolJPA getRol() {
-    return rol;
-}
+        return rol;
+    }
 
 //public void setRol(RolJPA rol) {
 //    this.rol = rol;
@@ -191,8 +188,4 @@ private List<DireccionJPA> direccionesJPA = new ArrayList<>();
 //    public void setImagen(String Imagen) {
 //        this.Imagen = Imagen;
 //    }
-
-
-
-
 }

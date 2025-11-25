@@ -79,7 +79,10 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 result.status = 400;
                 return result;
             }
-
+            UsuarioJPA usuarioExiste = entityManager.find(UsuarioJPA.class, usuario.IdUsuario);
+           
+            usuario.direccionesJPA = usuarioExiste.direccionesJPA;
+                    
             entityManager.merge(usuario);
             entityManager.flush();
 

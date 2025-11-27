@@ -43,62 +43,66 @@ public class UsuarioRestController {
     public ResponseEntity Add(@RequestBody UsuarioJPA usuario) {
         Result result = new Result();
         try {
+            System.out.println("=== API REST - Recibiendo Usuario ===");
+            System.out.println("Nombre: " + usuario.Nombre);
+            System.out.println("UserName: " + usuario.UserName);
+            System.out.println("Imagen recibida: " + (usuario.Imagen != null && !usuario.Imagen.isEmpty() ? "SÍ (" + usuario.Imagen.length() + " chars)" : "NO"));
+
             result = usuarioJPADAOImplementation.Add(usuario);
 
         } catch (Exception ex) {
             result.correct = false;
-            result.errorMessage = "Error al agregar al Usuario";
+            result.errorMessage = "Error al agregar al Usuario: " + ex.getMessage();
             result.status = 500;
             result.ex = ex;
+            ex.printStackTrace();
         }
-
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
     @PutMapping
     public ResponseEntity Update(@RequestBody UsuarioJPA usuario) {
         Result result = new Result();
-        try{
+        try {
             result = usuarioJPADAOImplementation.Update(usuario);
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "No se actualizo el usuario";
             result.status = 500;
         }
-        
+
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
     @DeleteMapping("/{idUsuario}")
-    public ResponseEntity Delete(@PathVariable int idUsuario){
+    public ResponseEntity Delete(@PathVariable int idUsuario) {
         Result result = new Result();
-        try{
+        try {
             result = usuarioJPADAOImplementation.Delete(idUsuario);
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "Eror No se Elimino el usuario";
             result.status = 500;
         }
-        
+
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
     @GetMapping("/{idUsuario}")
-    public ResponseEntity GetById(@PathVariable int idUsuario){
+    public ResponseEntity GetById(@PathVariable int idUsuario) {
         Result result = new Result();
-        try{
+        try {
             result = usuarioJPADAOImplementation.GetById(idUsuario);
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "Error, el usuario no se encontro";
             result.status = 500;
         }
-        
-        
+
         return ResponseEntity.status(result.status).body(result);
     }
- 
+
 }

@@ -2,6 +2,7 @@ package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -29,7 +31,7 @@ public class UsuarioJPA {
     public String Nombre;
 
     @Column(name = "username")
-    public String Username;
+    public String UserName;
 
     @Column(name = "apellidopaterno")
     public String ApellidoPaterno;
@@ -58,7 +60,9 @@ public class UsuarioJPA {
     @Column(name = "curp")
     public String CURP;
 
-    @Column(name = "imagen")
+    @Lob
+    @Column(name = "imagen", columnDefinition = "CLOB")
+    @JsonProperty("imagen")
     public String Imagen;
 
     @ManyToOne

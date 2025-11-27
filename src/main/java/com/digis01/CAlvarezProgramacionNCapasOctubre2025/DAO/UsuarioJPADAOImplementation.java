@@ -42,63 +42,77 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     }
 
     @Override
-@Transactional
-public Result Add(UsuarioJPA usuario) {
-    Result result = new Result();
-    try {
-        if (usuario == null) {
-            result.correct = false;
-            result.errorMessage = "El usuario no puede ser nulo";
-            result.status = 400;
-            return result;
-        }
-        
-        System.out.println("=== DAO ADD ===");
-        System.out.println("Usuario: " + usuario.Nombre);
-        System.out.println("Rol: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
-        System.out.println("Direcciones: " + (usuario.direccionesJPA != null ? usuario.direccionesJPA.size() : "null"));
-        
-        // ✅ ÚNICA MODIFICACIÓN NECESARIA: Establecer relación bidireccional
-        if (usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()) {
-            for (DireccionJPA direccion : usuario.direccionesJPA) {
-                direccion.setUsuarioJPA(usuario);
-                
-                // Cargar colonia managed si existe
-                if (direccion.getColoniaJPA() != null && direccion.getColoniaJPA().getIdColonia() > 0) {
-                    ColoniaJPA coloniaManaged = entityManager.find(
-                        ColoniaJPA.class, 
-                        direccion.getColoniaJPA().getIdColonia()
-                    );
-                    direccion.setColoniaJPA(coloniaManaged);
+    @Transactional
+    public Result Add(UsuarioJPA usuario) {
+        Result result = new Result();
+        try {
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "El usuario no puede ser nulo";
+                result.status = 400;
+                return result;
+            }
+
+            System.out.println("\n=== DAO ADD - Guardando en BD ===");
+            System.out.println("Usuario: " + usuario.Nombre);
+            System.out.println("UserName: " + usuario.UserName);
+            System.out.println("Email: " + usuario.Email);
+
+            if (usuario.Imagen != null && !usuario.Imagen.isEmpty()) {
+                System.out.println("✅ Imagen presente: " + usuario.Imagen.length() + " caracteres");
+                System.out.println("   Primeros 50 caracteres: " + usuario.Imagen.substring(0, Math.min(50, usuario.Imagen.length())));
+            } else {
+                System.out.println("⚠️ NO hay imagen para guardar");
+            }
+
+            System.out.println("Rol: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
+            System.out.println("Direcciones: " + (usuario.direccionesJPA != null ? usuario.direccionesJPA.size() : "null"));
+
+            if (usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()) {
+                for (DireccionJPA direccion : usuario.direccionesJPA) {
+                    direccion.setUsuarioJPA(usuario);
+
+                    if (direccion.getColoniaJPA() != null && direccion.getColoniaJPA().getIdColonia() > 0) {
+                        ColoniaJPA coloniaManaged = entityManager.find(
+                                ColoniaJPA.class,
+                                direccion.getColoniaJPA().getIdColonia()
+                        );
+                        if (coloniaManaged != null) {
+                            direccion.setColoniaJPA(coloniaManaged);
+                        }
+                    }
                 }
             }
-        }
-        
-        // Cargar rol managed si existe
-        if (usuario.getRol() != null && usuario.getRol().getIdRol() > 0) {
-            RolJPA rolManaged = entityManager.find(RolJPA.class, usuario.getRol().getIdRol());
-            usuario.setRol(rolManaged);
-        }
-        
-        entityManager.persist(usuario);
-        entityManager.flush();
 
-        result.correct = true;
-        result.status = 201;
-        result.object = usuario;
-        
-        System.out.println("✅ Usuario guardado ID: " + usuario.IdUsuario);
+            if (usuario.getRol() != null && usuario.getRol().getIdRol() > 0) {
+                RolJPA rolManaged = entityManager.find(RolJPA.class, usuario.getRol().getIdRol());
+                if (rolManaged != null) {
+                    usuario.setRol(rolManaged);
+                }
+            }
 
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = "Error: " + ex.getMessage();
-        result.ex = ex;
-        result.status = 500;
-        ex.printStackTrace();
+            entityManager.persist(usuario);
+            entityManager.flush();
+
+            result.correct = true;
+            result.status = 201;
+            result.object = usuario;
+
+            System.out.println(" Usuario guardado con ID: " + usuario.IdUsuario);
+            System.out.println(" Imagen guardada en BD: " + (usuario.Imagen != null ? "SÍ" : "NO"));
+
+        } catch (Exception ex) {
+            System.out.println(" ERROR en DAO.Add:");
+            ex.printStackTrace();
+
+            result.correct = false;
+            result.errorMessage = "Error al guardar usuario: " + ex.getMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+
+        return result;
     }
-
-    return result;
-}
 
     @Override
     @Transactional
@@ -112,9 +126,9 @@ public Result Add(UsuarioJPA usuario) {
                 return result;
             }
             UsuarioJPA usuarioExiste = entityManager.find(UsuarioJPA.class, usuario.IdUsuario);
-           
+
             usuario.direccionesJPA = usuarioExiste.direccionesJPA;
-                    
+
             entityManager.merge(usuario);
             entityManager.flush();
 
@@ -145,7 +159,7 @@ public Result Add(UsuarioJPA usuario) {
             UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
             entityManager.remove(usuario);
             entityManager.flush();
-            
+
             result.correct = true;
             result.status = 200;
             result.errorMessage = "El Usuario se Elimino";
@@ -157,25 +171,24 @@ public Result Add(UsuarioJPA usuario) {
         }
         return result;
     }
-    
+
     @Override
-    public Result GetById(int idUsuario){
+    public Result GetById(int idUsuario) {
         Result result = new Result();
-        try{
-            
+        try {
+
             UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
-            
+
             result.correct = true;
             result.status = 200;
             result.object = usuario;
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "El Usuario no se encontro";
             result.status = 500;
         }
-        
-        
+
         return result;
     }
 

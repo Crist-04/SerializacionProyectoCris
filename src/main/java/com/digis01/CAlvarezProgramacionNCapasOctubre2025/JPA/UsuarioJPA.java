@@ -73,17 +73,17 @@ public class UsuarioJPA {
         return rol;
     }
 
-//public void setRol(RolJPA rol) {
-//    this.rol = rol;
-//}
-//
-//public List<DireccionJPA> getDireccionesJPA() {
-//    return DireccionesJPA;
-//}
-//
-//public void setDireccionesJPA(List<DireccionJPA> direccionesJPA) {
-//    this.DireccionesJPA = direccionesJPA;
-//}
+public void setRol(RolJPA rol) {
+    this.rol = rol;
+}
+
+public List<DireccionJPA> getDireccionesJPA() {
+    return direccionesJPA;
+}
+
+public void setDireccionesJPA(List<DireccionJPA> direccionesJPA) {
+    this.direccionesJPA = direccionesJPA;
+}
 //
 //    public int getIdUsuario() {
 //        return IdUsuario;

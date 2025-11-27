@@ -42,31 +42,63 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     }
 
     @Override
-    @Transactional
-    public Result Add(UsuarioJPA usuario) {
-        Result result = new Result();
-        try {
-            if (usuario == null) {
-                result.correct = false;
-                result.errorMessage = "no puede ser nulo";
-                result.status = 400;
-                return result;
-            }
-            entityManager.persist(usuario);
-            entityManager.flush();
-
-            result.correct = true;
-            result.status = 201;
-            result.object = usuario;
-
-        } catch (Exception ex) {
+@Transactional
+public Result Add(UsuarioJPA usuario) {
+    Result result = new Result();
+    try {
+        if (usuario == null) {
             result.correct = false;
-            result.errorMessage = ex.getLocalizedMessage();
-            result.ex = ex;
+            result.errorMessage = "El usuario no puede ser nulo";
+            result.status = 400;
+            return result;
         }
+        
+        System.out.println("=== DAO ADD ===");
+        System.out.println("Usuario: " + usuario.Nombre);
+        System.out.println("Rol: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
+        System.out.println("Direcciones: " + (usuario.direccionesJPA != null ? usuario.direccionesJPA.size() : "null"));
+        
+        // ✅ ÚNICA MODIFICACIÓN NECESARIA: Establecer relación bidireccional
+        if (usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()) {
+            for (DireccionJPA direccion : usuario.direccionesJPA) {
+                direccion.setUsuarioJPA(usuario);
+                
+                // Cargar colonia managed si existe
+                if (direccion.getColoniaJPA() != null && direccion.getColoniaJPA().getIdColonia() > 0) {
+                    ColoniaJPA coloniaManaged = entityManager.find(
+                        ColoniaJPA.class, 
+                        direccion.getColoniaJPA().getIdColonia()
+                    );
+                    direccion.setColoniaJPA(coloniaManaged);
+                }
+            }
+        }
+        
+        // Cargar rol managed si existe
+        if (usuario.getRol() != null && usuario.getRol().getIdRol() > 0) {
+            RolJPA rolManaged = entityManager.find(RolJPA.class, usuario.getRol().getIdRol());
+            usuario.setRol(rolManaged);
+        }
+        
+        entityManager.persist(usuario);
+        entityManager.flush();
 
-        return result;
+        result.correct = true;
+        result.status = 201;
+        result.object = usuario;
+        
+        System.out.println("✅ Usuario guardado ID: " + usuario.IdUsuario);
+
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = "Error: " + ex.getMessage();
+        result.ex = ex;
+        result.status = 500;
+        ex.printStackTrace();
     }
+
+    return result;
+}
 
     @Override
     @Transactional

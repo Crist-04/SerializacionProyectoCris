@@ -44,6 +44,9 @@ public class UsuarioJPA {
 
     @Column(name = "password")
     public String Password;
+    
+    @Column(name = "estatus")
+    public Integer Estatus;
 
     @Column(name = "fechanacimiento")
     public Date FechaNacimiento;

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -102,6 +103,26 @@ public class UsuarioRestController {
             result.status = 500;
         }
 
+        return ResponseEntity.status(result.status).body(result);
+    }
+    
+    @PatchMapping("/{idUsuario}/imagen")
+    public ResponseEntity UpdateImagen(@PathVariable int idUsuario, @RequestBody String imagenBase64){
+        Result result = new Result();
+        
+        try{
+            result = usuarioJPADAOImplementation.GetById(idUsuario);
+            
+            UsuarioJPA usuario = (UsuarioJPA) result.object;
+            usuario.Imagen = imagenBase64;
+            
+            result = usuarioJPADAOImplementation.Update(usuario);
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = "No se actualizo la imagen";
+            result.status = 500;
+        }
         return ResponseEntity.status(result.status).body(result);
     }
 

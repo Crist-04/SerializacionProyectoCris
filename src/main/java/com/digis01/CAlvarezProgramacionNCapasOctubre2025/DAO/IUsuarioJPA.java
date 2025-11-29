@@ -15,5 +15,7 @@ public interface IUsuarioJPA {
     Result GetById(int idUsuario);
 
     Result Update(UsuarioJPA usuario);
+    
+    Result Login(String username, String password);
 
 }

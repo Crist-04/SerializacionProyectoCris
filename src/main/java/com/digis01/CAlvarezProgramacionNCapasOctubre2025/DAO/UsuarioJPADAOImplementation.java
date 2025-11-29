@@ -192,4 +192,46 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
+    @Override
+    public Result Login(String username, String password) {
+        Result result = new Result();
+        try {
+            TypedQuery<UsuarioJPA> query = entityManager.createQuery(
+                    "FROM UsuarioJPA u WHERE u.UserName = :username AND u.Password = :password",
+                    UsuarioJPA.class
+            );
+            query.setParameter("username", username);
+            query.setParameter("password", password);
+
+            List<UsuarioJPA> usuarios = query.getResultList();
+
+            if (!usuarios.isEmpty()) {
+                UsuarioJPA usuario = usuarios.get(0);
+
+                if (usuario.Estatus != null && usuario.Estatus == 1) {
+                    result.correct = true;
+                    result.status = 200;
+                    result.object = usuario;
+                    result.errorMessage = "Login exitoso";
+                } else {
+                    result.correct = false;
+                    result.status = 403;
+                    result.errorMessage = "Usuario inactivo";
+                }
+            } else {
+                result.correct = false;
+                result.status = 401;
+                result.errorMessage = "Credenciales incorrectas";
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error en el login: " + ex.getMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+
+        return result;
+    }
+
 }

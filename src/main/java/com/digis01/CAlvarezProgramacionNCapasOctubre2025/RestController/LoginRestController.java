@@ -49,10 +49,15 @@ public class LoginRestController {
                 loginResponse.setMensaje("Login exitoso");
                 loginResponse.setIdUsuario(usuario.IdUsuario);
                 loginResponse.setUsername(usuario.UserName);
+                
+                String rolNombre = (usuario.getRol()!= null) ? usuario.getRol().getNombre():"Sin Rol";
+                loginResponse.setRol(rolNombre);
+                
 
 
                 System.out.println("✅ Login exitoso - Token generado");
                 System.out.println("Token: " + token.substring(0, 50) + "...");
+                System.out.println("Rol: " +loginResponse.getRol());
 
                 return ResponseEntity.ok(loginResponse);
 

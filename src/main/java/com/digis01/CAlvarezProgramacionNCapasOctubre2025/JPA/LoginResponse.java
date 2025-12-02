@@ -1,23 +1,24 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA;
 
 public class LoginResponse {
-    
+
     private boolean correct;
     private String token;
     private String mensaje;
     private int idUsuario;
     private String username;
-
+    private String rol;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(boolean correct, String token, String mensaje, int idUsuario, String username) {
+    public LoginResponse(boolean correct, String token, String mensaje, int idUsuario, String username, String rol) {
         this.correct = correct;
         this.token = token;
         this.mensaje = mensaje;
         this.idUsuario = idUsuario;
         this.username = username;
+        this.rol = rol;
 
     }
 
@@ -61,5 +62,12 @@ public class LoginResponse {
         this.username = username;
     }
 
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
 
 }

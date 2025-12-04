@@ -44,10 +44,6 @@ public class UsuarioRestController {
     public ResponseEntity Add(@RequestBody UsuarioJPA usuario) {
         Result result = new Result();
         try {
-            System.out.println("=== API REST - Recibiendo Usuario ===");
-            System.out.println("Nombre: " + usuario.Nombre);
-            System.out.println("UserName: " + usuario.UserName);
-            System.out.println("Imagen recibida: " + (usuario.Imagen != null && !usuario.Imagen.isEmpty() ? "SÍ (" + usuario.Imagen.length() + " chars)" : "NO"));
 
             result = usuarioJPADAOImplementation.Add(usuario);
 
@@ -105,20 +101,20 @@ public class UsuarioRestController {
 
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
     @PatchMapping("/{idUsuario}/imagen")
-    public ResponseEntity UpdateImagen(@PathVariable int idUsuario, @RequestBody String imagenBase64){
+    public ResponseEntity UpdateImagen(@PathVariable int idUsuario, @RequestBody String imagenBase64) {
         Result result = new Result();
-        
-        try{
+
+        try {
             result = usuarioJPADAOImplementation.GetById(idUsuario);
-            
+
             UsuarioJPA usuario = (UsuarioJPA) result.object;
             usuario.Imagen = imagenBase64;
-            
+
             result = usuarioJPADAOImplementation.Update(usuario);
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "No se actualizo la imagen";
             result.status = 500;

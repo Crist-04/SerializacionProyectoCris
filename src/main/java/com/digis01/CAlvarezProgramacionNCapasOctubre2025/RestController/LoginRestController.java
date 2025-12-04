@@ -1,13 +1,17 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.RestController;
 
-import com.digis01.CAlvarezProgramacionNCapasOctubre2025.DAO.UsuarioJPADAOImplementation;
-import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.Result;
-import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.DAO.IUsuarioRepositoryDAO;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.LoginRequest;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.LoginResponse;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginRestController {
 
     @Autowired
-    private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private IUsuarioRepositoryDAO usuarioRepositoryDAO;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -28,56 +35,53 @@ public class LoginRestController {
         LoginResponse loginResponse = new LoginResponse();
 
         try {
-            System.out.println("\n=== LOGIN API ===");
-            System.out.println("Username recibido: " + loginRequest.getUsername());
 
-            // Validar credenciales
-            Result result = usuarioJPADAOImplementation.Login(loginRequest.getUsername(), loginRequest.getPassword());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-            if (result.correct) {
-                UsuarioJPA usuario = (UsuarioJPA) result.object;
+            UsuarioJPA usuario = usuarioRepositoryDAO.findByUsername(loginRequest.getUsername());
 
-                // Generar token JWT
-
-                String token = jwtUtil.generateToken(
-                    usuario.UserName, 
-                    usuario.IdUsuario
-                );
-
-                loginResponse.setCorrect(true);
-                loginResponse.setToken(token);
-                loginResponse.setMensaje("Login exitoso");
-                loginResponse.setIdUsuario(usuario.IdUsuario);
-                loginResponse.setUsername(usuario.UserName);
-                
-                String rolNombre = (usuario.getRol()!= null) ? usuario.getRol().getNombre():"Sin Rol";
-                loginResponse.setRol(rolNombre);
-                
-
-
-                System.out.println("✅ Login exitoso - Token generado");
-                System.out.println("Token: " + token.substring(0, 50) + "...");
-                System.out.println("Rol: " +loginResponse.getRol());
-
-                return ResponseEntity.ok(loginResponse);
-
-            } else {
-                // Credenciales incorrectas o usuario inactivo
+            if (usuario == null) {
                 loginResponse.setCorrect(false);
-                loginResponse.setMensaje(result.errorMessage);
-
-                System.out.println("❌ Login fallido: " + result.errorMessage);
-
-                return ResponseEntity.status(result.status).body(loginResponse);
+                loginResponse.setMensaje("Usuario no encontrado");
+                return ResponseEntity.status(404).body(loginResponse);
             }
 
-        } catch (Exception ex) {
-            System.out.println("❌ ERROR en login:");
-            ex.printStackTrace();
+            if (usuario.Estatus == null || usuario.Estatus != 1) {
+                loginResponse.setCorrect(false);
+                loginResponse.setMensaje("Usuario inactivo");
+                return ResponseEntity.status(403).body(loginResponse);
+            }
 
+            String token = jwtUtil.generateToken(
+                    usuario.UserName,
+                    usuario.IdUsuario
+            );
+
+            String rolNombre = (usuario.getRol() != null) ? usuario.getRol().getNombre() : "Sin rol";
+
+            loginResponse.setCorrect(true);
+            loginResponse.setToken(token);
+            loginResponse.setMensaje("Login exitoso");
+            loginResponse.setIdUsuario(usuario.IdUsuario);
+            loginResponse.setUsername(usuario.UserName);
+            loginResponse.setRol(rolNombre);
+
+            return ResponseEntity.ok(loginResponse);
+
+        } catch (BadCredentialsException e) {
+            loginResponse.setCorrect(false);
+            loginResponse.setMensaje("Usuario o contraseña incorrectos");
+            return ResponseEntity.status(401).body(loginResponse);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
             loginResponse.setCorrect(false);
             loginResponse.setMensaje("Error en el servidor: " + ex.getMessage());
-
             return ResponseEntity.status(500).body(loginResponse);
         }
     }

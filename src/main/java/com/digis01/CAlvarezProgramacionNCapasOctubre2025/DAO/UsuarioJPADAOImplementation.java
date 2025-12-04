@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,9 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Result GetAll() {
@@ -53,20 +57,15 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 return result;
             }
 
-            System.out.println("\n=== DAO ADD - Guardando en BD ===");
-            System.out.println("Usuario: " + usuario.Nombre);
-            System.out.println("UserName: " + usuario.UserName);
-            System.out.println("Email: " + usuario.Email);
+            if (usuario.Password != null && !usuario.Password.isEmpty()) {
+                if (!usuario.Password.startsWith("$2a$")) {
+                    String passwordOriginal = usuario.Password;
+                    usuario.Password = passwordEncoder.encode(usuario.Password);
 
-            if (usuario.Imagen != null && !usuario.Imagen.isEmpty()) {
-                System.out.println("✅ Imagen presente: " + usuario.Imagen.length() + " caracteres");
-                System.out.println("   Primeros 50 caracteres: " + usuario.Imagen.substring(0, Math.min(50, usuario.Imagen.length())));
-            } else {
-                System.out.println("⚠️ NO hay imagen para guardar");
+                } else {
+                    System.out.println("ℹ️ La contraseña ya está encriptada");
+                }
             }
-
-            System.out.println("Rol: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
-            System.out.println("Direcciones: " + (usuario.direccionesJPA != null ? usuario.direccionesJPA.size() : "null"));
 
             if (usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()) {
                 for (DireccionJPA direccion : usuario.direccionesJPA) {
@@ -98,13 +97,8 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             result.status = 201;
             result.object = usuario;
 
-            System.out.println(" Usuario guardado con ID: " + usuario.IdUsuario);
-            System.out.println(" Imagen guardada en BD: " + (usuario.Imagen != null ? "SÍ" : "NO"));
-
         } catch (Exception ex) {
-            System.out.println(" ERROR en DAO.Add:");
             ex.printStackTrace();
-
             result.correct = false;
             result.errorMessage = "Error al guardar usuario: " + ex.getMessage();
             result.ex = ex;
@@ -125,7 +119,23 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 result.status = 400;
                 return result;
             }
+
             UsuarioJPA usuarioExiste = entityManager.find(UsuarioJPA.class, usuario.IdUsuario);
+
+            if (usuarioExiste == null) {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                result.status = 404;
+                return result;
+            }
+
+            if (usuario.Password != null && !usuario.Password.isEmpty()) {
+                if (!usuario.Password.startsWith("$2a$")) {
+                    usuario.Password = passwordEncoder.encode(usuario.Password);
+                }
+            } else {
+                usuario.Password = usuarioExiste.Password;
+            }
 
             usuario.direccionesJPA = usuarioExiste.direccionesJPA;
 
@@ -139,8 +149,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = "Usuario no actualizado";
-            result.status = 404;
-            return result;
+            result.status = 500;
         }
         return result;
     }

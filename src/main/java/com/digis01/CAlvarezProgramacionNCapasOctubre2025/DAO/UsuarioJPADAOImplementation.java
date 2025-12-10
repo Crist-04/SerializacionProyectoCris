@@ -5,6 +5,8 @@ import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.DireccionJPA;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.RolJPA;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.Result;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.Service.EmailService;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
@@ -24,6 +26,9 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public Result GetAll() {
@@ -57,9 +62,42 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 return result;
             }
 
+//            if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+//                result.correct = false;
+//                result.errorMessage = "El correo es obligatirio";
+//                result.status = 400;
+//                return result;
+//
+//            }
+            TypedQuery<Long> emailQuery = entityManager.createQuery(
+                    "SELECT COUNT(u) FROM UsuarioJPA u WHERE u.Email = :email", Long.class);
+            emailQuery.setParameter("email", usuario.getEmail().trim());
+            Long emailCount = emailQuery.getSingleResult();
+
+            if (emailCount > 0) {
+                result.correct = false;
+                result.errorMessage = "El correo electrónico ya está registrado";
+                result.status = 400;
+                return result;
+            }
+
+            if (usuario.getUserName() != null && !usuario.getUserName().trim().isEmpty()) {
+                TypedQuery<Long> usernameQuery = entityManager.createQuery(
+                        "SELECT COUNT(u) FROM UsuarioJPA u WHERE u.UserName = :username", Long.class);
+                usernameQuery.setParameter("username", usuario.getUserName().trim());
+                Long usernameCount = usernameQuery.getSingleResult();
+
+                if (usernameCount > 0) {
+                    result.correct = false;
+                    result.errorMessage = "El nombre de usuario ya está registrado";
+                    result.status = 400;
+                    return result;
+                }
+            }
+
             if (usuario.Password != null && !usuario.Password.isEmpty()) {
                 if (!usuario.Password.startsWith("$2a$")) {
-                    String passwordOriginal = usuario.Password;
+                    // String passwordOriginal = usuario.Password;
                     usuario.Password = passwordEncoder.encode(usuario.Password);
 
                 } else {
@@ -90,6 +128,9 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 }
             }
 
+            usuario.Estatus = 1;
+            usuario.IsVerified = 0;
+
             entityManager.persist(usuario);
             entityManager.flush();
 
@@ -103,6 +144,18 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             result.errorMessage = "Error al guardar usuario: " + ex.getMessage();
             result.ex = ex;
             result.status = 500;
+            return result;
+        }
+        if (result.correct) {
+            try {
+                emailService.enviarCorreo(usuario);
+                System.out.println("Correo enviado a: " + usuario.getEmail());
+            } catch (MessagingException e) {
+                System.err.println(" Se creo el Usuario pero no se mando el correo" + e.getMessage());
+                e.printStackTrace();
+                result.errorMessage = "Se creo el usuario pero no se envio el correo";
+            }
+
         }
 
         return result;

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,6 +48,9 @@ public class UsuarioJPA {
     
     @Column(name = "estatus")
     public Integer Estatus;
+    
+    @Column(name = "isverified")
+    public Integer IsVerified;
 
     @Column(name = "fechanacimiento")
     public Date FechaNacimiento;
@@ -72,7 +76,7 @@ public class UsuarioJPA {
     @JoinColumn(name = "idrol")
     private RolJPA rol;
 
-    @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     public List<DireccionJPA> direccionesJPA = new ArrayList<>();
 
@@ -220,4 +224,37 @@ public void setDireccionesJPA(List<DireccionJPA> direccionesJPA) {
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
+
+    @JsonIgnore
+    public String getUserName() {
+        return UserName;
+    }
+
+    @JsonIgnore
+    public void setUserName(String UserName) {
+        this.UserName = UserName;
+    }
+
+    @JsonIgnore
+    public Integer getEstatus() {
+        return Estatus;
+    }
+
+    @JsonIgnore
+    public void setEstatus(Integer Estatus) {
+        this.Estatus = Estatus;
+    }
+
+    @JsonIgnore
+    public Integer getIsVerified() {
+        return IsVerified;
+    }
+
+    @JsonIgnore
+    public void setIsVerified(Integer IsVerified) {
+        this.IsVerified = IsVerified;
+    }
+    
+    
+    
 }

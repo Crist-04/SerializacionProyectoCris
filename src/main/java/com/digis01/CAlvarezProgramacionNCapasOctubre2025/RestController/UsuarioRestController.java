@@ -122,4 +122,18 @@ public class UsuarioRestController {
         return ResponseEntity.status(result.status).body(result);
     }
 
+    @GetMapping("/verificar/{idUsuario}")
+    public ResponseEntity VerificarCuenta(@PathVariable int idUsuario) {
+        Result result = new Result();
+        try {
+            result = usuarioJPADAOImplementation.VerficarCuenta(idUsuario);
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "La cuenta no se pudo verificar" + ex.getMessage();
+            result.status = 500;
+        }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
 }

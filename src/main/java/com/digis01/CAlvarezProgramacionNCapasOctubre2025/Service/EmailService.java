@@ -3,6 +3,7 @@ package com.digis01.CAlvarezProgramacionNCapasOctubre2025.Service;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,6 +18,9 @@ public class EmailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
+
+    @Value("${app.base.url:http://localhost:8081}")
+    private String baseUrl;
 
     public void enviarCorreo(UsuarioJPA usuario) throws MessagingException {
         String destinatario = usuario.getEmail();
@@ -33,7 +37,7 @@ public class EmailService {
         helper.setText(contenidoHtml, true);
 
         mailSender.send(mensaje);
-        
+
         System.out.println("Correo enviado a: " + destinatario);
     }
 
@@ -42,6 +46,11 @@ public class EmailService {
         String nombreCompleto = usuario.getNombre() + " "
                 + usuario.getApellidoPaterno() + " "
                 + usuario.getApellidoMaterno();
+
+        String idUsuarioCodificado = Base64.getEncoder()
+                .encodeToString(String.valueOf(usuario.IdUsuario).getBytes());
+
+        String enlaceVerificacion = baseUrl + "/usuario/verificar/" + idUsuarioCodificado;
 
         return "<!DOCTYPE html>\n"
                 + "<html lang=\"es\">\n"
@@ -57,11 +66,15 @@ public class EmailService {
                 + "    .content { padding: 40px 30px; color: #333; }\n"
                 + "    .content h2 { color: #5c6bc0; margin-bottom: 20px; }\n"
                 + "    .info-box { background: #e7f3ff; border-left: 4px solid #8FA3BD; padding: 15px; margin: 20px 0; border-radius: 4px; }\n"
+                + "    .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px; }\n"
                 + "    .credentials { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #e0e0e0; }\n"
                 + "    .credentials p { margin: 8px 0; }\n"
                 + "    .credentials strong { color: #5c6bc0; }\n"
+                + "    .btn-verificar { display: inline-block; background: linear-gradient(90deg, #28a745, #20c997); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); transition: all 0.3s; }\n"
+                + "    .btn-verificar:hover { background: linear-gradient(90deg, #218838, #1fa87a); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4); }\n"
                 + "    .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; border-top: 1px solid #e0e0e0; }\n"
                 + "    .welcome-icon { font-size: 64px; text-align: center; margin: 20px 0; }\n"
+                + "    .text-center { text-align: center; }\n"
                 + "  </style>\n"
                 + "</head>\n"
                 + "<body>\n"
@@ -74,9 +87,19 @@ public class EmailService {
                 + "      <h2>¡Hola " + usuario.getNombre() + "!</h2>\n"
                 + "      <p>Tu cuenta ha sido creada exitosamente por el administrador del sistema.</p>\n"
                 + "      \n"
+                + "      <div class=\"warning-box\">\n"
+                + "        <strong>️ Verificación Requerida</strong><br>\n"
+                + "        Para activar tu cuenta y poder iniciar sesión, debes verificar tu correo electrónico haciendo clic en el botón de abajo.\n"
+                + "      </div>\n"
+                + "      \n"
+                + "      <div class=\"text-center\">\n"
+                + "        <a href=\"" + enlaceVerificacion + "\" class=\"btn-verificar\">\n"
+                + "           Verificar mi Cuenta\n"
+                + "        </a>\n"
+                + "      </div>\n"
+                + "      \n"
                 + "      <div class=\"info-box\">\n"
-                + "        <strong> Tu cuenta está lista para usar</strong><br>\n"
-                + "        Ya puedes iniciar sesión en el sistema con tus credenciales.\n"
+                + "        <strong> Información de tu cuenta</strong>\n"
                 + "      </div>\n"
                 + "      \n"
                 + "      <div class=\"credentials\">\n"
@@ -86,7 +109,10 @@ public class EmailService {
                 + "        <p><strong> Rol:</strong> " + (usuario.getRol() != null ? usuario.getRol().getNombre() : "Usuario") + "</p>\n"
                 + "      </div>\n"
                 + "      \n"
-                + "      <p style=\"margin-top: 30px;\"><strong>Nota importante:</strong> Por seguridad, tu contraseña no se incluye en este correo. Fue proporcionada por el administrador al momento de crear tu cuenta.</p>\n"
+                + "      <p style=\"margin-top: 30px;\"><strong> Nota importante:</strong> Por seguridad, tu contraseña no se incluye en este correo. Fue proporcionada por el administrador al momento de crear tu cuenta.</p>\n"
+                + "      \n"
+                + "      <p style=\"margin-top: 20px; color: #6c757d; font-size: 14px;\">Si no puedes hacer clic en el botón, copia y pega este enlace en tu navegador:</p>\n"
+                + "      <p style=\"word-break: break-all; color: #0d6efd; font-size: 12px;\">" + enlaceVerificacion + "</p>\n"
                 + "      \n"
                 + "      <p style=\"margin-top: 20px; color: #6c757d; font-size: 14px;\">Si tienes alguna duda o no solicitaste esta cuenta, por favor contacta al administrador del sistema.</p>\n"
                 + "    </div>\n"

@@ -17,5 +17,7 @@ public interface IUsuarioJPA {
     Result Update(UsuarioJPA usuario);
     
     Result Login(String username, String password);
+    
+    Result VerficarCuenta(int idUsuario);
 
 }

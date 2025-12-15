@@ -296,4 +296,43 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
+    @Override
+    @Transactional
+    public Result VerficarCuenta(int idUsuario) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                result.status = 404;
+                return result;
+            }
+
+            if (usuario.IsVerified != null && usuario.IsVerified == 1) {
+                result.correct = false;
+                result.errorMessage = "La cuenta ya está verificada";
+                result.status = 400;
+                return result;
+            }
+
+            usuario.IsVerified = 1;
+            entityManager.merge(usuario);
+            entityManager.flush();
+
+            result.correct = true;
+            result.status = 200;
+            result.errorMessage = "Cuenta verificada exitosamente";
+            result.object = usuario;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error al verificar la cuenta: " + ex.getMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+        return result;
+    }
+
 }

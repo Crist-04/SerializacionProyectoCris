@@ -335,4 +335,61 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
+    @Override
+    @Transactional
+    public Result GetAllDinamico(String nombre, String apellidoPaterno, String apellidoMaterno, int idRol) {
+        Result result = new Result();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT DISTINCT u FROM UsuarioJPA u ");
+            jpql.append("LEFT JOIN FETCH u.rol ");
+            jpql.append("LEFT JOIN FETCH u.direccionesJPA d ");
+            jpql.append("LEFT JOIN FETCH d.ColoniaJPA c ");
+            jpql.append("LEFT JOIN FETCH c.MunicipioJPA m ");
+            jpql.append("LEFT JOIN FETCH m.EstadoJPA e ");
+            jpql.append("LEFT JOIN FETCH e.PaisJPA ");
+            jpql.append("WHERE 1=1 ");
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                jpql.append("AND UPPER (u.Nombre) LIKE UPPER (:nombre) ");
+            }
+            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
+                jpql.append("AND UPPER(u.ApellidoPaterno) LIKE UPPER(:apellidoPaterno) ");
+            }
+            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
+                jpql.append("AND UPPER(u.ApellidoMaterno) LIKE UPPER(:apellidoMaterno) ");
+            }
+            if (idRol > 0) {
+                jpql.append("AND u.rol.IdRol = :idRol ");
+            }
+
+            TypedQuery<UsuarioJPA> query = entityManager.createQuery(jpql.toString(), UsuarioJPA.class);
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                query.setParameter("nombre", "%" + nombre + "%");
+            }
+            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
+                query.setParameter("apellidoPaterno", "%" + apellidoPaterno + "%");
+            }
+            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
+                query.setParameter("apellidoMaterno", "%" + apellidoMaterno + "%");
+            }
+            if (idRol > 0) {
+                query.setParameter("idRol", idRol);
+            }
+
+            List<UsuarioJPA> usuariosJPA = query.getResultList();
+
+            result.object = usuariosJPA;
+            result.correct = true;
+            result.status = 200;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+        return result;
+    }
+
 }

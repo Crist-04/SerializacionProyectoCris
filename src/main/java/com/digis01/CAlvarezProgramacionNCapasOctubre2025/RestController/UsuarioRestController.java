@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -133,6 +134,26 @@ public class UsuarioRestController {
             result.errorMessage = "La cuenta no se pudo verificar" + ex.getMessage();
             result.status = 500;
         }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
+    @GetMapping("/busqueda")
+    public ResponseEntity<Result> BusquedaDinamica(
+            @RequestParam(required = false, defaultValue = "") String nombre,
+            @RequestParam(required = false, defaultValue = "") String apellidoPaterno,
+            @RequestParam(required = false, defaultValue = "") String apellidoMaterno,
+            @RequestParam(required = false, defaultValue = "0") int idRol) {
+
+        Result result = new Result();
+        try {
+            result = usuarioJPADAOImplementation.GetAllDinamico(nombre, apellidoPaterno, apellidoMaterno, idRol);
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error en la búsqueda: " + ex.getMessage();
+            result.status = 500;
+        }
+
         return ResponseEntity.status(result.status).body(result);
     }
 

@@ -19,5 +19,7 @@ public interface IUsuarioJPA {
     Result Login(String username, String password);
     
     Result VerficarCuenta(int idUsuario);
+    
+    Result GetAllDinamico(String nombre, String apellidoPaterno, String apellidoMaterno, int idRol);
 
 }

@@ -101,7 +101,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                     usuario.Password = passwordEncoder.encode(usuario.Password);
 
                 } else {
-                    System.out.println("ℹ️ La contraseña ya está encriptada");
+                    System.out.println("La contraseña ya está encriptada");
                 }
             }
 

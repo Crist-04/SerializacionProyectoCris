@@ -3,6 +3,7 @@ package com.digis01.CAlvarezProgramacionNCapasOctubre2025.RestController;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.DAO.UsuarioJPADAOImplementation;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.Result;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,9 @@ public class UsuarioRestController {
 
     @Autowired
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping
     public ResponseEntity GetAll() {
@@ -134,6 +138,45 @@ public class UsuarioRestController {
             result.errorMessage = "La cuenta no se pudo verificar" + ex.getMessage();
             result.status = 500;
         }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
+    @GetMapping("/verificar/token/{token}")
+    public ResponseEntity<Result> VerificarCuentaConToken(@PathVariable String token) {
+        Result result = new Result();
+        try {
+            if (!jwtUtil.validateVerificationToken(token)) {
+                result.correct = false;
+                result.errorMessage = "Token  expirado";
+                result.status = 400;
+                return ResponseEntity.status(result.status).body(result);
+            }
+
+            Integer idUsuario = jwtUtil.extractIdUsuario(token);
+
+            if (idUsuario == null) {
+                result.correct = false;
+                result.errorMessage = "No se pudo extraer el ID del usuario del token";
+                result.status = 400;
+                return ResponseEntity.status(result.status).body(result);
+            }
+
+            result = usuarioJPADAOImplementation.VerficarCuenta(idUsuario);
+
+        } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+            result.correct = false;
+            result.errorMessage = "El token ha expirado";
+            result.status = 400;
+        } catch (io.jsonwebtoken.JwtException ex) {
+            result.correct = false;
+            result.errorMessage = "Token inválido";
+            result.status = 400;
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error al verificar la cuenta: " + ex.getMessage();
+            result.status = 500;
+        }
+
         return ResponseEntity.status(result.status).body(result);
     }
 

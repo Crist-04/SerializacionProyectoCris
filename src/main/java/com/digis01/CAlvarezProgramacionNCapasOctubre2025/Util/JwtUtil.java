@@ -13,7 +13,8 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "password123456789012345678901234";
-    private static final long EXPIRATION_TIME = 86400000; 
+    private static final long EXPIRATION_TIME = 86400000;
+    private static final long VERIFICATION_EXPIRATION_TIME = 172800000;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -29,10 +30,32 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateVerificationToken(String email, int idUsuario) {
+        return Jwts.builder()
+                .claim("idUsuario", idUsuario)
+                .claim("email", email)
+                .claim("type", "verification")
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + VERIFICATION_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public boolean validateToken(String token, String username) {
         try {
             final String tokenUsername = extractUsername(token);
             return (tokenUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean validateVerificationToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            String tokenType = claims.get("type", String.class);
+            return "verification".equals(tokenType) && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
@@ -44,6 +67,10 @@ public class JwtUtil {
 
     public Integer extractIdUsuario(String token) {
         return extractAllClaims(token).get("idUsuario", Integer.class);
+    }
+
+    public String extractEmail(String token) {
+        return extractAllClaims(token).get("email", String.class);
     }
 
     private boolean isTokenExpired(String token) {

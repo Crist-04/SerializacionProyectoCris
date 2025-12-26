@@ -1,6 +1,7 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.Service;
 
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.JPA.UsuarioJPA;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.Util.JwtUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Base64;
@@ -15,6 +16,9 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -47,10 +51,12 @@ public class EmailService {
                 + usuario.getApellidoPaterno() + " "
                 + usuario.getApellidoMaterno();
 
-        String idUsuarioCodificado = Base64.getEncoder()
-                .encodeToString(String.valueOf(usuario.IdUsuario).getBytes());
+        String tokenVerificacion = jwtUtil.generateVerificationToken(
+                usuario.getEmail(),
+                usuario.IdUsuario
+        );
 
-        String enlaceVerificacion = baseUrl + "/usuario/verificar/" + idUsuarioCodificado;
+        String enlaceVerificacion = baseUrl + "/usuario/verificar/" + tokenVerificacion;
 
         return "<!DOCTYPE html>\n"
                 + "<html lang=\"es\">\n"
@@ -111,13 +117,10 @@ public class EmailService {
                 + "      \n"
                 + "      <p style=\"margin-top: 30px;\"><strong> Nota importante:</strong> Por seguridad, tu contraseña no se incluye en este correo. Fue proporcionada por el administrador al momento de crear tu cuenta.</p>\n"
                 + "      \n"
-                + "      <p style=\"margin-top: 20px; color: #6c757d; font-size: 14px;\">Si no puedes hacer clic en el botón, copia y pega este enlace en tu navegador:</p>\n"
-                + "      <p style=\"word-break: break-all; color: #0d6efd; font-size: 12px;\">" + enlaceVerificacion + "</p>\n"
-                + "      \n"
                 + "      <p style=\"margin-top: 20px; color: #6c757d; font-size: 14px;\">Si tienes alguna duda o no solicitaste esta cuenta, por favor contacta al administrador del sistema.</p>\n"
                 + "    </div>\n"
                 + "    <div class=\"footer\">\n"
-                + "      <p>&copy; 2025 Sistema de Usuarios. Todos los derechos reservados.</p>\n"
+                + "      <p>&copy; 2025 Sistema de Usuarios.</p>\n"
                 + "    </div>\n"
                 + "  </div>\n"
                 + "</body>\n"
